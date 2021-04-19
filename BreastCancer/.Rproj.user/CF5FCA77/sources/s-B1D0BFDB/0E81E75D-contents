@@ -1,0 +1,301 @@
+---
+title: "Lab 2 - Data Exploration Guides"
+author: "Đoàn Mạnh Hiếu"
+date: "2020/10/09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Bài hướng dẫn này được lược dịch từ phần lab trong chương 2 của sách "Gareth James, Daniela Witten, Trevor Hastie and Robert Tibshirani, *An Introduction to Statistical Learningwith Applications in R*, Springer, 2013. http://www-bcf.usc.edu/~gareth/ISL/".
+
+## 1. Các lệnh cơ bản
+
+R sử dụng các hàm để thao tác với dữ liệu. Cú pháp một hàm có dạng `function_names(arguments)`, trong đó, `function_names` là tên hàm, `arguments` là (các) đối số (còn được gọi là các `input`) của hàm. Ví dụ, để tạo một vector ta dùng hàm `c()` (viết tắt của `concatenate`). Lệnh sau dùng để tạo một vector gồm có 4 phần tử 1, 3, 2, 5, và lưu vào biến `x`. Ta ghi `x` để in ra vector.
+
+```{r 1}
+x <- c(1,3,2,5)
+x
+```
+
+Ta cũng có thể dùng dấu = thay vì <- để mô tả phép gán.
+
+```{r 2}
+x = c(1,6,2)
+x
+y = c(1,4,3)
+```
+
+Ta có thể dùng phím mũi tên lên để sử dụng lại các câu lệnh đã viết. Gõ `?function_names` sẽ khiến R mở file hướng dẫn để cung cấp thông tin về hàm `function_names`. 
+
+Ta có thể cộng hai vector x và y bằng cách viết `x + y` như thông thường. Tuy nhiên `x` và `y` nên có cùng chiều dài. Hàm `length()` cho biết chiều dài của vector.
+
+```{r 3}
+length(x)
+length(y)
+x + y
+```
+
+Hàm `ls()` cho ta biết các đối tượng (object) ta đã lưu đến thời điểm hiện tại. Hàm `rm()` dùng để xóa các đối tượng.
+
+```{r 4}
+ls()
+rm(x,y)
+ls()
+```
+
+Có thể xóa tất cả các đối tượng một lần như sau:
+
+```{r 5}
+rm(list=ls())
+```
+
+Hàm `matrix` đươc dùng để tạo ma trận. Trước khi dùng hàm này, ta có thể tìm hiểu thêm về hàm này bằng cách viết:
+
+```{r 6,eval=FALSE}
+?matrix
+```
+
+R sẽ mở file hướng dẫn cung cấp thông tin về cú pháp và cách sử dụng hàm này. Hàm `matrix` có nhiều đối số nhưng ở đây ta chỉ tập trung vào các đối số chính là dữ liệu (`data`), số dòng (`nrow`) và số cột (`ncol`). Ta có thể tạo một ma trận đơn giản như sau:
+```{r 7}
+x=matrix(data=c(1,2,3,4), nrow=2, ncol=2)
+x
+```
+
+Nếu viết đúng thứ tự các đối số, ta có thể bỏ `data=`, `nrow=`, và `ncol=` trong hàm `matrix`.
+
+```{r 8, eval=FALSE}
+x = matrix(c(1,2,3,4) ,2,2)
+```
+
+Mặc định, R tạo ra ma trận từ dãy số theo cột, nếu muốn tạo ra ma trận từ dãy số theo hàng ta thêm lựa chọn `byrow=TRUE`.
+
+```{r 9}
+matrix(c(1,2,3,4), 2, 2, byrow=TRUE)
+```
+
+Lệnh trên không gán ma trận tạo ra vào biến `x`. Do đó, ma trận này không được lưu lại.
+
+Hàm `sqrt()` dùng để tính căn bậc hai. Lệnh `x^2` dùng để tính lũy thừa 2 cho từng phần tử của `x`.
+
+```{r 10}
+sqrt(x)
+x^2
+```
+
+Hàm `rnorm()` dùng để tạo ra một vector của các biến ngẫu nhiên tuân theo phân phối chuẩn (normal/Gaussian distribution) với đối số đầu tiên n là số phần tử. Mỗi khi gọi hàm này, ta thu được một kết quả khác nhau. Hàm `cor()` dùng để tính sự tương quan của hai dãy số.
+
+```{r 11}
+x=rnorm(50)
+y=x+rnorm(50,mean=50,sd=.1)
+cor(x,y)
+```
+
+Mặc định, hàm `rnorm()` tạo ra ra một vector của các biến ngẫu nhiên tuân theo phân phối chuẩn với giá trị trung bình (`mean`) bằng 0 và độ lệch chuẩn (`standard deviation`) bằng 1. Ta có thể thay đổi hai giá trị này bằng hai đối số `mean` và `sd`. Thông thường, khi làm việc với số ngẫu nhiên, ta thường sử dụng hàm `set.seed()` để người khác có thể lặp lại với các kết quả ngẫu nhiên giống như ta đã làm.
+
+```{r 12}
+set.seed(1303)
+rnorm(50)
+```
+
+Hàm `mean()` và `var()` có thể được dùng để tính giá trị trung bình và phương sai của một vector. Độ lệch chuẩn có thể được tính dùng hàm `sd()` hoặc `sqrt(var())`.
+
+```{r 13}
+set.seed(3)
+y=rnorm(100)
+mean(y)
+var(y)
+sqrt(var(y))
+sd(y)
+```
+
+## 2. Vẽ đồ thị
+Hàm `plot()` là hàm cơ bản để vẽ minh họa dữ liệu trong R. Ví dụ `plot(x,y)` sinh ra một đồ thị `scatterplot` của các số trong `x` và các số trong `y`. Hàm `plot()` có nhiều đối số khác như được minh họa bên dưới. Bạn có thể tìm hiểu thêm thông tin về hàm `plot()` bằng cách gõ `?plot`.
+
+```{r 14}
+x=rnorm(100)
+y=rnorm(100)
+plot(x,y)
+plot(x,y,xlab="this is the x-axis",
+     ylab="this is the y-axis",
+     main="Plot of X vs Y")
+```
+
+Hàm `seq()` có thể được dùng để tạo một dãy các số. Ví dụ, `seq(a,b)` tạo ra một dãy số gồm các số từ `a` đến `b`. Hàm này còn có nhiều đối số khác. Ví dụ, `seq(0,1,length=10)` tạo ra một dãy 10 số có khoảng cách bằng nhau từ 0 đến 1. Viết gọn `1:10` tương đương với `seq(1:10)`.
+
+```{r 15}
+x=seq(1,10)
+x
+x=1:10
+x
+x=seq(-pi,pi,length =50)
+x
+```
+
+## 3. Thao tác trên ma trận
+
+Giả sử dữ liệu của ta chứa trên ma trận A.
+
+```{r 16}
+A=matrix(1:16,4,4)
+A
+```
+
+Khi viết `A[2,3]`, ta sẽ truy xuất phần tử ở dòng 2 và cột 3 của ma trận `A`. Giá trị thứ nhất, sau dấu `[` luôn mô tả dòng, giá trị thứ hai luôn mô tả cột.
+
+```{r 17}
+A[2,3]
+```
+
+Ta có thể truy xuất nhiều dòng và cột của ma trận A cùng một lúc.
+
+```{r 18}
+A[c(1,3),c(2,4)]
+A[1:3,2:4]
+A[1:2,]
+A[,1:2]
+```
+
+Hai lệnh cuối lần lượt không mô tả chỉ số cho cột và cho dòng. Điều này sẽ làm R tự hiểu là lấy tất cả cột hoặc dòng tương ứng. R xem một dòng hay một cột của ma trận là một vector.
+
+```{r 19}
+A[1,]
+```
+
+Sử dụng dấu `-` trong chỉ số dòng hoặc cột sẽ nói với R loại bỏ dòng hay cột đó ra khỏi kết quả.
+
+```{r 20}
+A[-c(1,3) ,]
+A[-c(1,3) ,-c(1,3,4)]
+```
+
+Hàm dim() cho biết số dòng và số cột của ma trận.
+
+```{r 21}
+dim(A)
+```
+
+## 4. Load dữ liệu
+
+Trước khi load dữ liệu ta cần thiết lập thư mục đang làm việc (working directory) để báo cho R biết nơi chứa file dữ liệu. Ta có thể xem và thiết lập thư mục đang làm việc bằng lệnh `getwd()` và `setwd()`.
+
+```{r 22}
+getwd()
+setwd("D:/University/3_2/datamining/lab2")
+```
+
+Dữ liệu ở định dạng `csv (comma separated value)` khá phổ biến. Để load dữ liệu này vào R ta dùng hàm `read.csv()`. Ví dụ, lệnh sau load dữ liệu từ file `Auto.csv` vào R.
+
+```{r 23a}
+Auto=read.csv("Auto.csv")
+```
+
+Lệnh `fix()` dùng để hiển thị dữ liệu `Auto` mới load được dưới dạng bảng.
+
+```{r 23b, eval=FALSE}
+fix(Auto)
+```
+
+Dữ liệu trong file Auto.csv có một số giá trị bị thiếu (thể hiện bằng dấu ?). Ta dùng lựa chọn `na.strings` để báo cho R biết khi nó gặp ký tự lạ (như dấu ? trong trường hợp này) nó nên xem nó như giá trị bị thiếu. Đối số `header=T` (hay `header=TRUE`) báo R biết dòng đầu tiên trong file dữ liệu là header (tên thuộc tính, tên cột). 
+
+```{r 24a}
+Auto=read.csv("Auto.csv",header=T,na.strings ="?")
+```
+
+```{r 24b, eval=FALSE}
+fix(Auto)
+```
+
+Xem số dòng và số cột của dữ liệu dùng hàm `dim()`.
+
+```{r 25}
+dim(Auto)
+```
+
+Với các dòng bị thiếu giá trị trong dữ liệu (có 5 dòng bị thiếu giá trị trong file Auto.csv), ta có thể loại bỏ nó đi. Hàm `na.omit()` có thể cho phép ta loại bỏ các dòng này.
+
+```{r 26}
+Auto=na.omit(Auto)
+dim(Auto)
+```
+
+Ta có thể sử dụng hàm `names()` để biết tên của các thuộc tính (tên các cột) trong dữ liệu.
+
+```{r 27}
+names(Auto)
+```
+
+Để xem tổng quan về cấu trúc của tập dữ liệu ta có thể dùng lệnh `str()`.
+
+```{r 28}
+str(Auto)
+```
+
+## 5. Tổng hợp dữ liệu
+
+Ta có thể sử dụng hàm `plot()` để vẽ các đồ thị `scatterplot` của các biến định lượng. Tuy nhiên, nếu chỉ dùng tên biến (tên cột) thì R sẽ không biết các biến này vì hiện tại R chỉ biết một object là Auto. 
+
+```{r 29, eval=FALSE}
+plot(cylinders , mpg)
+```
+
+Lệnh trên sẽ xuất ra thông báo lỗi sau:
+
+`Error in plot(cylinders, mpg) : object 'cylinders' not found`
+
+Để tham chiếu đến thuộc tính `cylinders` trong Auto. Ta phải kết hợp tên dataset và tên biến với dấu `$`. Nếu không dùng cách này, ta có thể sử dụng hàm `attach()` để báo cho R dùng tên các biến trong dataset trực tiếp.
+
+```{r 30}
+plot(Auto$cylinders, Auto$mpg)
+attach(Auto) n
+plot(cylinders, mpg)
+```
+
+Biến `cylinders` được lưu ở dạng số. Tuy nhiên, biến này chỉ có một vài giá trị và có thể xem nó như là một biến kiểu định tính. Hàm `as.factor()` cho phép chuyển một biến từ dạng định lượng sang dạng định tính.
+
+```{r 31}
+cylinders = as.factor(cylinders)
+```
+
+Nếu biến được vẽ theo tọa độ x (`x-axis`) là biến định tính. Hàm `plot()` sẽ sinh ra kết quả như `boxplots`. Dưới đây là thử nghiệm hàm `plot()` với nhiều đối số khác nhau.
+
+```{r 32}
+plot(cylinders , mpg)
+plot(cylinders , mpg, col="red")
+plot(cylinders , mpg, col="red", varwidth =T)
+plot(cylinders , mpg, col="red", varwidth =T,horizontal =T)
+plot(cylinders , mpg, col="red", varwidth =T, xlab="cylinders ",ylab="MPG")
+```
+
+Hàm `hist()` là hàm vẽ biểu đồ tần số (`histogram`). 
+
+```{r 33}
+hist(mpg)
+hist(mpg,col=2)
+hist(mpg,col=2,breaks =15)
+```
+
+Hàm `pairs()` vẽ một ma trận các biểu đồ `scatterplot` cho mỗi cặp biến trong data set. Ta có thể sinh ra một các biểu đồ `scatterplot` cho một số biến nào đó.
+
+```{r 34}
+pairs(Auto)
+pairs(~mpg + displacement + horsepower + weight + acceleration, Auto)
+```
+
+Hàm `summary()` sinh ra các giá trị tổng kết (min, Q1, median, Q3, max) cho mỗi biến trong data set.
+
+```{r 35}
+summary(Auto)
+```
+
+Với các biến định tính, chẳng hạn như name, R sẽ liệt kê tần số xuất hiện của các giá trị theo từng loại. Ta cũng có thể sinh ra một tổng kết cho một biến.
+
+```{r 36}
+summary(mpg)
+```
+
+## 6. Tham khảo thêm
+Trang http://www.statmethods.net liệt kê khá nhiều ví dụ hữu ích cho người mới bắt đầu.
+
