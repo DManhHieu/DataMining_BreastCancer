@@ -71,6 +71,7 @@ data=data.frame(data,OutCome)
 data$class<-NULL
 data$Sample_No<-NULL
 
+data$OutCome<-as.factor(data$OutCome)
 
 ```
 **Xem dữ liệu thô**
@@ -96,4 +97,67 @@ sum(is.na(data))
 
 ```{r}
 table(data$OutCome)/nrow(data)
+``` 
+Có 65% lành tính( benign) và 37% ác tính trong số các bệnh nhân được chẩn đoán trong tập dataset.
+
+
+*Building model*
+
+
+```{r eval=FALSE}
+#install.packages("randomForest")
+```
+
+```{r library}
+library(randomForest)
+```
+
+```{r model}
+
+rf_model <- randomForest(OutCome ~ ., data=data, ntree=1500, mtry=3, importance=TRUE)
+rf_model
+```
+Số cây : 1500
+Số biến được thử ở mỗi lần tách : 3
+Loại random forest: phân loại
+OOB estimate tỉ lệ lỗi : 3 %
+
+
+```{r plotmodel}
+plot(rf_model)
+
+```
+Biểu đồ lỗi cho biết lỗi với các lớp khác nhau ( màu đỏ và xanh) và out-of-bag so với số lượng cây. Màu đỏ lành tính và mày xanh ác tính. Lỗi thấp nhất đạt được từ 1200, sau đó điều chỉnh cũng không cải thiện hiệu suất.
+
+
+**chia tập dữ liệu thành tập training và testing**
+chia dữ liệu 70% train và 30% test
+```{r installLibrary eval=false}
+#install.packages("caTools")
+```
+
+```{r splitdata}
+set.seed(2)
+library(caTools)
+sample<-sample.split(data$OutCome, SplitRatio=0.70)
+
+data.train<- subset(data,sample==TRUE)
+
+data.test<-subset(data,sample==FALSE)
+```
+**Model building & Interpretation on Training and Testing Data**
+
+```{r program1}
+r_model<-randomForest(OutCome~., data=data.train, ntree=1500, mtry=3, importance=TRUE)
+
+print(r_model)
+```
+OOB error or prediction error : 4.49%
+
+```{r program1}
+plot(r_model)
+```
+
+```{r program1}
+plot(margin(r_model, data.test$OutCome))
 ```
