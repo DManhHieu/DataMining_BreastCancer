@@ -7,26 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
 Dữ liệu được lấy từ trang https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/
 
 Citation Request:
@@ -72,18 +52,20 @@ Citation Request:
 
 **Đọc dữ liệu**
 ```{r read_data}
+#Ctrl+Shift+H để chọn directory chứa folder data
+data_path <- file.path( "/data", "breast-cancer-wisconsin.data")
+
 names <- c('Sample_No', 'Clump_Thickness', 'Uniformity_Cell_Size', 
          'Uniformity_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
          'Bare_Nuclei', 'Bland_Chromatin', 
          'Normal_Nucleoli','Mitoses', 
          'class')
 
-data <- read.table("D:/Data/breast-cancer-wisconsin.data", sep = ',', col.names = names)
+data <- read.table(data_path, sep = ',', col.names = names)
+#"D:/University/3_2/datamining/project/DataMining_BreastCancer/BreastCancer/data/breast-cancer-wisconsin.data"
+OutCome=ifelse(data$class==2,"No","Yes")
 
-
-Benign=ifelse(data$class==2,"Yes","No")
-
-data=data.frame(data,Benign)
+data=data.frame(data,OutCome)
 
 #drop class and sample_no column
 data$class<-NULL
@@ -91,9 +73,27 @@ data$Sample_No<-NULL
 
 
 ```
-Xem dữ liệu thô
+**Xem dữ liệu thô**
 ```{r head}
 head(data,5)
+```
+```{r str}
 str(data)
+```
+```{r summary}
 summary(data)
+```
+
+```{r column name}
+names(data)
+```
+```{r datatype}
+class(data)
+```
+```{r checkNa}
+sum(is.na(data))
+```
+
+```{r}
+table(data$OutCome)/nrow(data)
 ```
