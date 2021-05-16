@@ -144,14 +144,14 @@ set.seed(2)
 
 sample<-sample.split(data$OutCome, SplitRatio=0.80)
 
-data.train<- subset(data,sample==TRUE)
+data.trainvalidation<- subset(data,sample==TRUE)
 
 data.test<-subset(data,sample==FALSE) #0.2 test
 
 
-#sample_val <- sample.split(data.trainvalidation$OutCome, SplitRatio = 0.75)
-#data.train <- subset(data.trainvalidation,sample_val==TRUE) # 0.6 train
-#data.validation <- subset(data.trainvalidation,sample_val==FALSE) #0.2 validation
+sample_val <- sample.split(data.trainvalidation$OutCome, SplitRatio = 0.75)
+data.train <- subset(data.trainvalidation,sample_val==TRUE) # 0.6 train
+data.validation <- subset(data.trainvalidation,sample_val==FALSE) #0.2 validation
 
 ```
 **Model building & Interpretation on Training and Testing Data**
@@ -276,26 +276,31 @@ for (ntree in ntrees){
 
 ```
 
-set.seed(7)
-rf_model <- train(OutCome~., data=data.train, method="rf", ntry= 1500 , tuneGrid=tunegrid)
-print(rf_model)
 
-pre <- predict(rf_model, data.validation)
+#Cách 2 #
+```{r }
+ntrees <-c(100,200,300,400,500,600, 800,850, 1000,1100, 1200,1500, 2000)
+mtrees <- c(1:15)
+best_rmse <-1
+for (ntree in ntrees)
+   for (mtree in mtrees){
+      rf_model <- randomForest(OutCome ~ ., data=data.train, ntree=ntree, mtry=mtree, importance=TRUE) #train ở tập train
+       pre <- predict(rf_model, data.validation) # đánh giá trên tập validation
+       rmse= sqrt(mean(pre != data.validation$OutCome)^2) # hàm đánh giá RMSE
+       print(paste(ntree, mtree ,rmse))
+       if(best_rmse>rmse){
+          best_ntry=ntree
+          best_mtry=mtree
+          best_rmse=rmse
+       }
+   }
+print(paste(best_ntry, best_mtry ,best_rmse))
 
-rmse= sqrt(mean(pre != data.validation$OutCome)^2)
-print(rmse)
 
-
-
-Huấn luyện lại trên tập test và validation với tham số vừa được chọn
-
-
-Thử nghiệm trên tập test
-
-
+```
 
 ```{r program1}
-
+ rf_model <- randomForest(OutCome ~ ., data=data.trainvalidation, ntree=best_ntry, mtry=best_mtry, importance=TRUE)
 
 
 summary(rf_model)
@@ -309,11 +314,6 @@ plot(rf_model)
 ```
 
 
-```{r program1}
-plot(margin(rf_model, data.test$OutCome))
-```
-
-
 
 ```{r }
 ran_pred <- predict(rf_model, data.test)
@@ -322,8 +322,10 @@ table(data.test$OutCome, ran_pred)
 
 ```
 ```{r}
-ran_prob <- predict(rf_model,data.test,type = "prob" )
+ran_prob <- predict(rf_model,data.test)
 ran_prob
-ran_prob1<-data.frame(ran_prob)
+#ran_prob1<-data.frame(ran_prob)
+rmse= sqrt(mean(ran_prob != data.test$OutCome)^2)
+print(rmse)
 ```
 
