@@ -62,6 +62,7 @@ Citation Request:
 library(randomForest)
 library(caTools)
 library(caret)
+library(class)
 ```
 **Đọc dữ liệu**
 ```{r read_data}
@@ -93,6 +94,12 @@ head(data,5)
 ```
 ```{r str}
 str(data)
+
+# Chuyển Bảe_Nuclei về dạng numeric
+
+data$Bare_Nuclei=as.integer(data$Bare_Nuclei)
+
+str(data)
 ```
 ```{r summary}
 summary(data)
@@ -106,6 +113,9 @@ class(data)
 ```
 ```{r checkNa}
 sum(is.na(data))
+
+data=na.omit(data)
+
 ```
 
 ```{r}
@@ -228,3 +238,50 @@ rmse= sqrt(mean(ran_prob != data.test$OutCome)^2)
 print(rmse)
 ```
 
+
+# KNN
+```{r}
+
+classifier_knn <- knn(train = data.train[,1:9], 
+                      test = data.validation[,1:9], 
+                      cl= data.train$OutCome ,
+                      k=5 )
+classifier_knn
+misClassError <- mean(classifier_knn != data.validation$OutCome)
+print(paste('Accuracy =', 1-misClassError))
+```
+
+```{r }
+library(class)
+trainKNN= data.train
+
+validKNN= data.validation
+klist<- c(1:10)
+best_accuracyKNN <- 0
+best_k<-0
+for(k in klist){
+   classifier_knn <- knn(train = data.train[,1:9], 
+                      test = data.validation[,1:9], 
+                      cl= data.train$OutCome ,
+                      k=k )
+   misClassError <- mean(classifier_knn != data.validation$OutCome)
+   if(1-misClassError>best_accuracyKNN){
+      best_accuracyKNN=1-misClassError
+      best_k=k
+   }
+ 
+}
+print(paste('Accuracy =', best_accuracyKNN, 'k=',best_k))
+
+```
+```{r }
+# train và test lại
+classifier_knn <- knn(train = data.trainvalidation[,1:9], 
+                      test = data.test[,1:9], 
+                      cl= data.trainvalidation$OutCome ,
+                      k=best_k )
+classifier_knn
+misClassError <- mean(classifier_knn != data.test$OutCome)
+print(paste('Accuracy =', 1-misClassError))
+
+```
