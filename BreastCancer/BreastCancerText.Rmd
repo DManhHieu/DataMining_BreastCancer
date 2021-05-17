@@ -6,24 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+# instruction data
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
@@ -77,23 +60,80 @@ names <- c('Sample_No', 'Clump_Thickness', 'Uniformity_Cell_Size',
          'Bare_Nuclei', 'Bland_Chromatin', 
          'Normal_Nucleoli','Mitoses', 
          'class')
+data_set <- read.table("E:/Nam3_KyII/Data mining/DoAn/DataMining_BreastCancer/BreastCancer/data/breast-cancer-wisconsin.data", sep = ',', col.names = names)
 
-data <- read.table("D:/Data/breast-cancer-wisconsin.data", sep = ',', col.names = names)
+data_set<-data.frame(data_set)
 
+data_set<-data_set[data_set$Bare_Nuclei != "?",]
+data_set$Bare_Nuclei<-as.numeric(data_set$Bare_Nuclei)
 
-Benign=ifelse(data$class==2,"Yes","No")
+Benign<-ifelse(data_set$class==2,"Yes","No")
 
-data=data.frame(data,Benign)
+data_set<-data.frame(data_set,Benign)
 
 #drop class and sample_no column
-data$class<-NULL
-data$Sample_No<-NULL
-
-
+data_set$class<-NULL
+data_set$Sample_No<-NULL
+data_set
 ```
-Xem dữ liệu thô
+**Xem dữ liệu thô**
 ```{r head}
-head(data,5)
-str(data)
-summary(data)
+head(data_set,5)
+str(data_set)
+summary(data_set)
+```
+```{r }
+library(rpart)
+library(rpart.plot)
+#set.seed(123)
+num <- nrow(data_set)
+train_index = sample(num, size = trunc(0.85 * num))
+train_data = data_set[train_index, ]
+test_data = data_set[-train_index, ]
+
+
+
+model.full<- rpart(Benign ~., data = train_data, method = "class")
+model.full
+prp(model.full)
+rpart.plot(model.full, extra = 100)
+
+
+Predict <- predict(model.full, test_data, type = "class")
+Predict
+
+
+Confusion_matrix <- table(Predict,test_data$Benign)
+print(Confusion_matrix)
+
+Error_rate=1-(Confusion_matrix[1,1]+Confusion_matrix[2,2])/sum(Confusion_matrix)
+Error_rate
+```
+
+
+```{r }
+library(glmnet)
+library(Matrix)
+library(lattice)
+library(ellipsis)
+library(ggplot2)
+library(gower)
+library(caret)
+library(rpart)
+library(rpart.plot)
+
+
+model.tree<- train(Benign ~., data = data_set, method="rpart", trControl=trainControl(method = "cv"))
+model.tree
+rpart.plot(model.tree$finalModel, extra = 104, nn = TRUE)
+
+Predict<-predict(model.tree$finalModel, test_data, type = "class")
+Predict
+
+Confusion_matrix <- table(Predict,test_data$Benign)
+print(Confusion_matrix)
+
+Error_rate=1-(Confusion_matrix[1,1]+Confusion_matrix[2,2])/sum(Confusion_matrix)
+Error_rate
+
 ```
