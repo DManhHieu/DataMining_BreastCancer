@@ -49,13 +49,7 @@ Citation Request:
   10. Mitoses(Mitoses)                                           1 - 10
   11. Class:(class)                                             (2 for benign, 4 for malignant)
 
-```{r eval=FALSE}
-#install.packages("randomForest")
-```
-```{r installLibrary eval=false}
-#install.packages("caTools")
 
-```
 
   
 ```{r library }
@@ -208,7 +202,7 @@ print(paste(best_ntry, best_mtry ,best_rmse))
 print(paste(best_ntryac, best_mtryac ,best_accuracy))
 ```
 
-```{r program1}
+```{r}
  rf_model <- randomForest(OutCome ~ ., data=data.trainvalidation, ntree=best_ntry, mtry=best_mtry, importance=TRUE)
 
 
@@ -218,7 +212,7 @@ print(rf_model)
 ```
 
 
-```{r program1}
+```{r }
 plot(rf_model)
 ```
 
@@ -236,6 +230,9 @@ ran_prob
 #ran_prob1<-data.frame(ran_prob)
 rmse= sqrt(mean(ran_prob != data.test$OutCome)^2)
 print(rmse)
+
+accuracy=postResample(ran_prob,data.test$OutCome )[1]
+print(accuracy)
 ```
 
 

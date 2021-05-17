@@ -1,0 +1,163 @@
+Breast Cancer
+========================================================
+author: 
+date: 
+autosize: true
+
+
+```{r, echo=FALSE}
+library(randomForest)
+library(caTools)
+library(caret)
+library(class)
+
+data_path <- file.path( "/data", "breast-cancer-wisconsin.data")
+
+names <- c('Sample_No', 'Clump_Thickness', 'Uniformity_Cell_Size', 
+         'Uniformity_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
+         'Bare_Nuclei', 'Bland_Chromatin', 
+         'Normal_Nucleoli','Mitoses', 
+         'class')
+
+data <- read.table(data_path, sep = ',', col.names = names)
+#"D:/University/3_2/datamining/project/DataMining_BreastCancer/BreastCancer/data/breast-cancer-wisconsin.data"
+OutCome=ifelse(data$class==2,"No","Yes")
+
+data=data.frame(data,OutCome)
+
+#drop class and sample_no column
+data$class<-NULL
+data$Sample_No<-NULL
+
+data$OutCome<-as.factor(data$OutCome)
+data$Bare_Nuclei=as.integer(data$Bare_Nuclei)
+
+```
+
+Breast Cancer
+========================================================
+Ung thư vú là loại ung thư đứng hàng thứ hai xảy ra ở phụ nữ so với tất cả các loại ung thư khác.
+
+- Khối u lành tính
+- Khối u ác tính
+
+
+Mô tả về tập dữ liệu
+========================================================
+**Breast Cancer Wisconsin Data set có sẵn trong UCI Machine Learning Repository**
+
+Được thu thập từ University of Wisconsin Hospitals Dataset có tổng cộng **699 pattern** gồm 16 pattern lỗi, 683 pattern không lỗi, gồm **11 biến**: 1 biến kiểu nominal, 9 biến là kiểu numberic và 1 biến kiểu binary attributes.
+
+Thông tin các thuộc tính
+========================================================
+
+-	Sample code number: id của dataset
+- Clump thickness : độ dày cụm tế bào lành tính
+- Uniformity of Cell Size : tính đồng nhất về kích thước của tế bào
+- Uniformity of Cell Shape: tính đồng nhất về hình dạng của tế bào
+
+Thông tin các thuộc tính
+=================================================
+-	Marginal Adhesion: các tế bào bính thường có xu hướng kết dính lại với nhau
+-	Single Epithelial Cell Size
+-	Bare Nuclei
+-	Bland Chromatin
+-	Normal Nucleoli
+-	Mitoses
+-	Class
+
+
+=====================================
+```{r, echo=FALSE}
+str(data)
+```
+Dataset
+=============================================
+458 mẫu lành tính chiếm 65.5%
+
+241 mẫu ác tính chiếm 34.5%
+```{r, echo=FALSE}
+table(data$OutCome)/nrow(data)
+``` 
+Độ đo để đánh giá kết quả
+==========================
+RMSE
+
+Accuracy
+
+
+Thuật toán và phương pháp đánh giá
+==================================
+Random forest
+
+KNN
+
+K-fold cross validation
+
+Decision tree 
+
+Random Forest
+===================================
+```{r ,echo=FALSE}
+data=na.omit(data)
+rf_model <- randomForest(OutCome ~ ., data=data, ntree=1500, mtry=3, importance=TRUE)
+
+print(rf_model)
+
+```
+
+=======================
+```{r ,echo=FALSE}
+plot(rf_model)
+
+```
+
+KNN
+==============================
+
+```{r, echo=FALSE}
+set.seed(2)
+
+sample<-sample.split(data$OutCome, SplitRatio=0.80)
+
+data.trainvalidation<- subset(data,sample==TRUE)
+
+data.test<-subset(data,sample==FALSE) #0.2 test
+
+
+sample_val <- sample.split(data.trainvalidation$OutCome, SplitRatio = 0.75)
+data.train <- subset(data.trainvalidation,sample_val==TRUE) # 0.6 train
+data.validation <- subset(data.trainvalidation,sample_val==FALSE) #0.2 validation
+```
+Chia tập dữ liệu 
+==================================
+
+Train : 60%
+
+Validation: 20%
+
+Test : 20%
+
+=============================
+```{r}
+dim(data.train)
+dim(data.validation)
+dim(data.test)
+```
+
+
+Model
+=========================
+```{r}
+classifier_knn <- knn(train = data.trainvalidation[,1:9], 
+                      test = data.test[,1:9], 
+                      cl= data.trainvalidation$OutCome ,
+                      k=3 )
+misClassError <- mean(classifier_knn != data.test$OutCome)
+print(paste('Accuracy =', 1-misClassError))
+```
+
+
+
+
+
