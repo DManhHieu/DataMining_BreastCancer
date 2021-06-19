@@ -1,0 +1,54 @@
+---
+title: 'Báo cáo môn: Khai phá dữ liệu'
+author: "Group18"
+date: "6/19/2021"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Đề tài: Predicting Probability of Malignant and Benign Breast Cancer 
+
+<Span>**Giáo viên hướng dẫn**" Quách Đình Hoàng </Span>
+
+<span>**Thành viên**:</span>
+
+<span>18110281    Đoàn Mạnh Hiếu</span>
+
+<span>18110352    Đặng Văn Sang</span>
+
+<span>18110288    Trần Ngọc Hoàng</span>
+
+<span>18110283    Nguyễn Ngọc Trung Hiếu</span>
+```{r cars}
+```
+
+## 1. Tóm tắt
+  
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+
+```
+
+
+## 2. Giới thiệu
+## 2.1. Bài toán sử dụng
+## 2.1.1. Random Forest
+  Random Forest là một Ensemble Classifiers. Thuật toán Random Forest là một tập hợp rất nhiều Decision Tree (cây quyết định). Chẳng hạn, bạn muốn đi du lịch ở Việt Nam, có nhiều địa điểm bạn muốn đi như Sa Pa, Quảng Ninh, Đà Lạt, bạn sẽ tham khảo ý kiến từ bạn bè, trên báo, trang mạng. Với mỗi ý kiến được đưa ra từ các nguồn đó sẽ tương ứng với một Decision Tree. Mỗi Decision Tree này sẽ trả lời các nhu cầu của bạn như giá cả đắt hay rẻ, phong cảnh đẹp hay không, dịch vụ giải trí gì ở đó, thời gian bạn có thể ở lại với từng địa điểm. Cứ như vậy, ta có được một rừng Decision Tree. Thuât toán Random Forest sẽ đánh giá Decision Tree bằng cách Vote để đưa ra kết quả cuối cùng của bài toán.
+
+
+  Random Forest rất có hiệu quả cho bài toán phân loại vì nó sử dụng hàng chục, hàng trăm mô hình nhỏ hơn trong nó với nhiều quy luật khác nhau, từ đó sẽ đưa ra quyết định cuối cùng. 
+  
+  Input: Random Forest bắt đầu bằng Decision Tree. Trong từng Decision Tree, một input sẽ đựa đưa vào top của Decision Tree đó, theo Decision Tree để dữ liệu được chia thành những tập nhỏ hơn. Random Forest trong code sẽ nhận hai tham số là ntree (số cây) và mtry (_______) để thực hiện bài toán trên dữ liệu
+  
+  Output: Mỗi Decision Tree cho ra một kết quả. Như vậy, với hàng trăm, hàng ngàn Decision Tree, ta sẽ có hàng trăm, hàng ngàn kết quả. Random Forest tiến hành chọn lọc kết quả bằng việc vote từ kết quả của toàn bộ Decision Tree.
+  
+## 2.2.2. K-nearest neighbors
+  K-nearest neighbors (KNN) là một thuật toán supervised-learning đơn giản. Thuật toán này sẽ không rút ra được kết quả từ quá trình training (lazy learning), mà nó tính toán bằng việc dự đoán kết quả của dữ liệu mới. KNN có thể áp dụng cho hai loại bài toán đó là Classification và Regression.
+  Input: từ dữ liệu đầu vào, thuật toán KNN sẽ tiến hành lấy các record, tính toàn distance giữa các record, và giá trị k (là số neighbor gần nhất cần truy xuất)
+  Output: từ input, KNN có được khoảng cách tới các record khác, xác định được k neighbor gần nhất. Từ đó, thuật toán KNN sẽ sử dụng các nhãn của các neightbor gần nhất để xác định các nhãn cho các record chưa biết. Ví dụ có thể thực hiện bằng cách lấy vote đa số.
