@@ -3,14 +3,20 @@ title: 'Báo cáo môn: Khai phá dữ liệu'
 author: "Group18"
 date: "6/19/2021"
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+
+library(randomForest)
+library(caTools)
+library(caret)
+library(class)
 ```
 
 ## Đề tài: Predicting Probability of Malignant and Benign Breast Cancer 
@@ -53,13 +59,48 @@ Giáo viên hướng dẫn: Quách Đình Hoàng
   
   Dữ liệu có 11 biến. Trong đó, 1 biến kiểu nominal, 9 kiểu numberic và 1 kiểu binary attributes.
   
+```{r read_data, echo=FALSE }
+#Ctrl+Shift+H để chọn directory chứa folder data
+data_path <- file.path( "/data", "breast-cancer-wisconsin.data")
+
+names <- c('Sample_No', 'Clump_Thickness', 'Uniformity_Cell_Size', 
+       'Uniformity_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
+       'Bare_Nuclei', 'Bland_Chromatin', 
+       'Normal_Nucleoli','Mitoses', 
+       'class')
+
+data <- read.table(data_path, sep = ',', col.names = names)
+#"D:/University/3_2/datamining/project/DataMining_BreastCancer/BreastCancer/data/breast-cancer-wisconsin.data"
+str(data)
+```
+  
 ## 3.2. Phân chia dữ liệu
   Đối với thuật toán Random Forest, nhóm chia dữ liệu thành 2 phần, 70% cho tập training và 30% cho tập testing.
   
   Đối với các thuật toán còn lại, nhóm chia dữ liệu thành 3 phần, 60% cho tập training, 20% cho tập validation và 20% cho tập testing.
   
   Nhóm sẽ tiến hành loại bỏ cột đầu tiên trong tập dữ liệu Breast Cancer bởi vì nó không có ý nghĩa trong quá trình giải quyết bài toán.
-  
+```{r, echo=FALSE}
+OutCome=ifelse(data$class==2,"No","Yes")
+
+data=data.frame(data,OutCome)
+
+#drop class and sample_no column
+data$class<-NULL
+data$Sample_No<-NULL
+
+data$OutCome<-as.factor(data$OutCome)
+
+# Chuyển Bare_Nuclei về dạng numeric
+
+data$Bare_Nuclei=as.integer(data$Bare_Nuclei)
+
+
+# Xoá na 
+
+data=na.omit(data)
+
+```
 # 4. Giải pháp
 ## 4.1. Thuật toán Random Forest
 ### Các công thức
@@ -205,23 +246,66 @@ Kết quả dự đoán trên tập test cho giá trị Balanced Accuracy và Fs
 ## 5.2
  
 ## 5.3 K-nearest neighbors 
+```{r splitdata, echo=FALSE}
+set.seed(2)
 
-- Thực hiện huấn luyện trên tập train và thử nghiệm trên tập validation
+sample<-sample.split(data$OutCome, SplitRatio=0.80)
 
-  - Xây dựng model KNN với k=5 :
+data.trainvalidation<- subset(data,sample==TRUE)
 
-![](KnnK5.jpg)
+data.test<-subset(data,sample==FALSE) #0.2 test
 
-  Sử dụng độ đo Accuracy cho ta biết kết quả đúng ở mức 98.5%
 
-- Tìm siêu tham số k:
+sample_val <- sample.split(data.trainvalidation$OutCome, SplitRatio = 0.75)
+data.train <- subset(data.trainvalidation,sample_val==TRUE) # 0.6 train
+data.validation <- subset(data.trainvalidation,sample_val==FALSE) #0.2 validation
+``` 
 
-  - Chạy k từ 1 đến 9 với độ đo Accuracy thu được : Accuracy = 0.992700729927007 k= 3
+Sử dụng k=5 train trên tập train
+```{r , echo=FALSE}
 
-- Train lại trên tập train và validation, sau đó thử nghiệm ở tập test:
+classifier_knn <- knn(train = data.train[,1:9], 
+                      test = data.validation[,1:9], 
+                      cl= data.train$OutCome ,
+                      k=5 )
+classifier_knn
+misClassError <- mean(classifier_knn != data.validation$OutCome)
+print(paste('Accuracy =', 1-misClassError))
+```
 
-![](KnnKbest.jpg)
-  Như vậy model KNN trên tập dữ liệu hiện có đã cho độ chính xác 100%
+Tìm siêu tham số k dựa vào tập train và validation :
+```{r , echo=FALSE}
+i=1
+k.optm=1
+
+for ( i in 1:28){
+  knn.mod <- knn(train = data.train[,1:9], 
+                      test = data.validation[,1:9], 
+                      cl= data.train$OutCome ,
+                      k=i )
+  
+  k.optm[i]<-100*sum(data.validation$OutCome==knn.mod)/NROW(data.validation)
+  k=i
+  cat(k,'=',k.optm[i],'\n')
+}
+plot(k.optm,type="b",xlab="K-value", ylab="Accuracy level")
+
+```
+
+Kết quả tốt nhất tại k=3, Accuracy=99.27007% 
+
+Kết quả sau khi huấn luyện trên tập train và validation với k=3 :
+```{r , echo=FALSE}
+# train và test lại
+classifier_knn <- knn(train = data.trainvalidation[,1:9], 
+                      test = data.test[,1:9], 
+                      cl= data.trainvalidation$OutCome ,
+                      k=3 )
+classifier_knn
+misClassError <- mean(classifier_knn != data.test$OutCome)
+print(paste('Accuracy =', 1-misClassError))
+
+```
 
 
 ## 5.4
