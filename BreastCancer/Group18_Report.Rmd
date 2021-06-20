@@ -3,8 +3,10 @@ title: 'Báo cáo môn: Khai phá dữ liệu'
 author: "Group18"
 date: "6/19/2021"
 output:
-  word_document: default
+  html_document:
+    df_print: paged
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,23 +25,14 @@ Giáo viên hướng dẫn: Quách Đình Hoàng
 |18110283| Nguyễn Ngọc Trung Hiếu|
 |18110288| Trần Ngọc Hoàng|
 |18110352| Đặng Văn Sang|
-```{r cars}
-```
 
-## 1. Tóm tắt
-  
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 
-```
 
 
 # 1. Tóm tắt
 
-```{r pressure, echo=FALSE}
 
-```
 
 # 2. Giới thiệu
   Bài toán nhóm muốn giải quyết ở đây là dựa vào dữ liệu Breast Cancer (ung thư vú) đã thu thập được, nhóm sẽ phân tích các đặc điểm và kết quả để có thể từ đó, dựa vào các đặc điểm đã biết có thể dự đoán được các kết quả chưa biết trong tương lai.
@@ -211,22 +204,24 @@ Kết quả dự đoán trên tập test cho giá trị Balanced Accuracy và Fs
 
 ## 5.2
  
-## 5.3
+## 5.3 K-nearest neighbors 
 
-Xây dựng model KNN với k=5 :
+- Thực hiện huấn luyện trên tập train và thử nghiệm trên tập validation
+
+  - Xây dựng model KNN với k=5 :
 
 ![](KnnK5.jpg)
 
-Sử dụng độ đo Accuracy cho ta biết kết quả đúng ở mức 98.5%
+  Sử dụng độ đo Accuracy cho ta biết kết quả đúng ở mức 98.5%
 
-Tìm siêu tham số k:
+- Tìm siêu tham số k:
 
-Chạy k từ 1 đến 9 với độ đo Accuracy thu được : Accuracy = 0.992700729927007 k= 3
+  - Chạy k từ 1 đến 9 với độ đo Accuracy thu được : Accuracy = 0.992700729927007 k= 3
 
-Train lại trên tập train và validation, sau đó thử nghiệm ở tập test:
+- Train lại trên tập train và validation, sau đó thử nghiệm ở tập test:
 
 ![](KnnKbest.jpg)
-Như vậy model KNN trên tập dữ liệu hiện có đã cho độ chính xác 100%
+  Như vậy model KNN trên tập dữ liệu hiện có đã cho độ chính xác 100%
 
 
 ## 5.4
