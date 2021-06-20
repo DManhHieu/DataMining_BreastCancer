@@ -13,17 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Đề tài: Predicting Probability of Malignant and Benign Breast Cancer 
 
-<Span>**Giáo viên hướng dẫn**" Quách Đình Hoàng </Span>
+Giáo viên hướng dẫn: Quách Đình Hoàng 
 
-<span>**Thành viên**:</span>
+**Thành viên**
 
-<span>18110281    Đoàn Mạnh Hiếu</span>
-
-<span>18110352    Đặng Văn Sang</span>
-
-<span>18110288    Trần Ngọc Hoàng</span>
-
-<span>18110283    Nguyễn Ngọc Trung Hiếu</span>
+| MSSV | Họ và tên |
+|------|-----------|
+|18110281| Đoàn Mạnh Hiếu|
+|18110283| Nguyễn Ngọc Trung Hiếu|
+|18110288| Trần Ngọc Hoàng|
+|18110352| Đặng Văn Sang|
 ```{r cars}
 ```
 
@@ -106,7 +105,76 @@ plot(pressure)
 ### Cách hoạt động
 
     Random Forest bắt đầu bằng Decision Tree. Trong từng Decision Tree, một input sẽ đựa đưa vào top của Decision Tree đó, theo Decision Tree để dữ liệu được chia thành những tập nhỏ hơn. Random Forest trong code sẽ nhận hai tham số là ntree (số cây cần thực hiện) và mtry (số lượng biến được lấy mẫu ngẫu nhiên) để thực hiện bài toán trên dữ liệu. Mỗi Decision Tree cho ra một kết quả. Như vậy, với hàng trăm, hàng ngàn Decision Tree, ta sẽ có hàng trăm, hàng ngàn kết quả. Random Forest tiến hành chọn lọc kết quả bằng việc vote từ kết quả của toàn bộ Decision Tree.
+
+## 4.2 Naive bayes
+
+### Mô tả thuật toán ( công thức)
+
+### Cách hoạt động
+
+## 4.3 K-nearest neighbors
+
+### Mô tả thuật toán ( công thức)
+
+K-nearest neighbors cho rằng mỗi object có thể biểu diễn thành một điểm trên không gian. Các điểm có đặc điểm tương tự nhau sẽ gần nhau. Dựa vào "khoảng cách" đó để sử dụng cho bài toán phân loại hoặc hồi quy.
+
+Với tập học: mỗi object $x$ được biển diễn dạng vector $n$ chiều trong không gian $X \in R^n$ tức $x=(x_1,x_2,...,x_n)$ trong đó $x_i \in R$
+
+Ta có thể xác định nhãn của $z$ vào lớp c1 hoặc c2 dựa vào $k$ láng giềng gần nhất với tập học theo hình sau
+
+![](KnnExample1.jpg)
+
+Xét 1 láng giềng gần nhất thì $z$ thuộc lớp c2
+
+Xét 3 láng giềng gần nhất thì $z$ thuộc lớp c1
+
+Xét 5 láng giềng gần nhất thì $z$ thuộc lớp c1
+
+
+
+Các công thức quan trọng:
+
+- Hàm dự đoán giá trị đầu ra: lấy bình quân giá trị lớp của k phần tử láng giềng gần nhất
+  $$y_z=\frac{1}{k}\sum_{x\in NB(z)}Y_x$$ 
+
+  - Trong đó: 
+     
+     - $y_z$ là lớp của z
+     
+     - $k$ là số lượng láng giềng
+     
+     - $NB(z)$ là tập $k$ làng giềng gần nhất của $z$
+     
+     - $Y_x$ lớp của x
     
+Người sử dụng phải tự lựa chọn K. K=1 thường không chính xác với bài toán phân lớp, bài toán có 2 lớp cần chọn K lẻ nhằm tránh sự cân bằng giữa 2 lớp.
+    
+- Hàm tính khoảng cách d
+  
+  - Hàm Euclide
+  
+  $$d(x,z)={(\sum_{i=1}^n{|x_i-z_i|}^p)}^{\frac{1}{p}}$$
+
+### Cách hoạt động
+
+Giai đoạn "học": Với $(x_1,x_2,...,x_n)$ thuộc lớp $c$, hệ thống "học" bằng cách "ghi nhớ" $p=(x_1,x_2,...,x_n,c)$ vào tập học.
+  
+  - Kết quả có "Kho dữ liệu": $D=\{p\}$
+
+Giai đoạn "phân lớp": 
+  
+  - Giả sử phân lớp cho mẫu mới $z$
+  
+  - Với mỗi $x_i \in D$ ta tính "khoảng cách" $d$ giữa $x_i$ với $z$
+  
+  - Trên cơ sở đó xác định tập k láng giềng gần nhất của z
+  Phân $z$ vào lớp mà có số láng giềng chiếm số đông
+
+## 4.4 Decision tree
+
+### Mô tả thuật toán ( công thức)
+
+### Cách hoạt động   
 # 5. Thực nghiệm và kết quả
 ## 5.1. Thuật toán Random Forest
 ### Cách chọn siêu tham số
@@ -138,7 +206,30 @@ Như trong biểu đồ, ta thấy mtry bằng 3 cho sai số OOB nhỏ nhất. 
 
 Kết quả dự đoán trên tập train của Random Forest cho giá trị Balanced Accuraty là 97.59% và Fscore = 97.95%. Điều này có nghĩa là model Random Forest được xây dụng trên hai siêu tham số ntree và mtry tìm được đạt độ chính xác cao, mang lại hiệu quả tốt.
 
-Kết quả dự đoán trên tập test cho giá trị Balanced Accuracy và Fscore đều đạt giá trị 100%. Như vậy, với model Random Forest được nhóm em xây dựng, việc dự đoán những kết quả chưa biết mang độ chính xác 100%
+Kết quả dự đoán trên tập test cho giá trị Balanced Accuracy và Fscore đều đạt giá trị 100%. Như vậy, với model Random Forest được nhóm xây dựng, việc dự đoán những kết quả chưa biết mang độ chính xác 100%
+
+
+## 5.2
+ 
+## 5.3
+
+Xây dựng model KNN với k=5 :
+
+![](KnnK5.jpg)
+
+Sử dụng độ đo Accuracy cho ta biết kết quả đúng ở mức 98.5%
+
+Tìm siêu tham số k:
+
+Chạy k từ 1 đến 9 với độ đo Accuracy thu được : Accuracy = 0.992700729927007 k= 3
+
+Train lại trên tập train và validation, sau đó thử nghiệm ở tập test:
+
+![](KnnKbest.jpg)
+Như vậy model KNN trên tập dữ liệu hiện có đã cho độ chính xác 100%
+
+
+## 5.4
 
 
 # 6. Kết luận
